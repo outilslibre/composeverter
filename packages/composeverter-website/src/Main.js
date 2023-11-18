@@ -21,13 +21,13 @@ nginx:
 const doConversion = (conversion, input) => {
     if (conversion === 'latest') {
         return Composeverter.migrateToCommonSpec(input);
-    } else if (conversion === 'v1ToV2x') {
+    } if (conversion === 'v1ToV2x') {
         return Composeverter.migrateFromV1ToV2x(input);
-    } else if (conversion === 'v1ToV3x') {
+    } if (conversion === 'v1ToV3x') {
         return Composeverter.migrateFromV2xToV3x(Composeverter.migrateFromV1ToV2x(input));
-    } else if (conversion === 'v2xToV3x') {
+    } if (conversion === 'v2xToV3x') {
         return Composeverter.migrateFromV2xToV3x(input);
-    } else if (conversion === 'v3xToV2x') {
+    } if (conversion === 'v3xToV2x') {
         return Composeverter.migrateFromV3xToV2x(input);
     }
     throw new Error(`Unknown conversion '${conversion}'`);
