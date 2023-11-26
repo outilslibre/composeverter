@@ -22,8 +22,20 @@ const setDeepValue = (obj: any, path: string, value: any) => {
 };
 
 export const migrateFromV2xToV3x = content => {
+export const yamlCheck = (content: string) => {
+    const doc = yaml.parseDocument(content, { prettyErrors: true });
+    const logs = [];
+
+    doc.errors.forEach((err) => logs.push(`ERR: ${err.message}`));
+    doc.warnings.forEach((warn) => logs.push(`WARN: ${warn.message}`));
+
+    if (logs.length > 0) {
+        throw logs.join('\n');
+    }
+};
 
 const yamlParse = (content: string) => {
+    yamlCheck(content);
     return yaml.parse(content);
 };
 
@@ -319,4 +331,5 @@ module.exports = {
     migrateFromV1ToV2x,
     migrateFromV3xToV2x,
     migrateFromV2xToV3x,
+    yamlCheck,
 };
