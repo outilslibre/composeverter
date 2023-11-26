@@ -21,3 +21,7 @@ db:
         );
     }).toThrow();
 });
+
+test('warnings', () => {
+    expect(() => migrateToCommonSpec('%FOO\n---bar\n')).toThrow();
+});

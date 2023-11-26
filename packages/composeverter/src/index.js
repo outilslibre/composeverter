@@ -117,7 +117,7 @@ const yamlParse = (content: string) => {
     return yaml.parse(content);
 };
 
-const yamlStringify = (data: any, configuration?: Configuration = null) => {
+const yamlStringify = (data: any, configuration?: Configuration) => {
     applyExpansions(data, configuration);
     return yaml.stringify(data, { indent: 4, simpleKeys: true }).trim();
 };
@@ -127,7 +127,7 @@ interface Configuration {
     expandPorts?: boolean;
 }
 
-const applyExpansions = (data: any, configuration?: Configuration = null) => {
+const applyExpansions = (data: any, configuration?: Configuration) => {
     if (configuration && configuration.expandVolumes) {
         Object.values(data.services).forEach((service) => {
             if (service.volumes) {
