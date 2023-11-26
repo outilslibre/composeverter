@@ -21,7 +21,85 @@ const setDeepValue = (obj: any, path: string, value: any) => {
     schema[pList[len - 1]] = value;
 };
 
-export const migrateFromV2xToV3x = content => {
+const portSpecRegex =
+    /^((\[?(?<ip>[a-fA-F\d.:]+)\]?:)?(?<host>[\d]*(-[\d]+)?):)?(?<container>[\d]+(-[\d]+)?)(\/(?<proto>(udp|tcp|sctp)))?$/;
+
+export const getPortLongSyntaxFromPortSpec = (ports: string) => {
+    const portMatch = ports.match(portSpecRegex);
+    if (portMatch === null) {
+        return ports;
+    }
+
+    const target = portMatch.groups.container;
+    if (target && target.includes('-')) {
+        return ports;
+    }
+
+    const longSyntax = { target: parseInt(target, 10) };
+
+    if (portMatch.groups.ip) {
+        longSyntax.host_ip = portMatch.groups.ip;
+    }
+
+    if (portMatch.groups.host) {
+        longSyntax.published = portMatch.groups.host;
+    }
+
+    if (portMatch.groups.proto) {
+        longSyntax.protocol = portMatch.groups.proto;
+    }
+
+    longSyntax.mode = 'ingress';
+
+    return longSyntax;
+};
+
+const volumeSpecRegex =
+    /^(?<volume>([A-Za-z]:\/|[A-Za-z]:\\)?.*?):(?<container_path>([A-Za-z]:\/|[A-Za-z]:[\\])?.*?)(?::(?<flags>(rw|ro|z|Z)(,(rw|ro|z|Z))*))?$/;
+
+export const getVolumeNameFromVolumeSpec = (volume: string) => {
+    const volumeMatch = volume.match(volumeSpecRegex);
+    if (volumeMatch === null) {
+        return '';
+    }
+
+    return volumeMatch.groups.volume;
+};
+
+export const isNamedVolume = (source: string) =>
+    source &&
+    !source.includes('/') &&
+    !source.includes('\\') &&
+    !source.includes('~') &&
+    !source.includes('.') &&
+    !source.includes('$');
+
+export const getVolumeLongSyntaxFromVolumeSpec = (volume: string) => {
+    const volumeMatch = volume.match(volumeSpecRegex);
+    if (volumeMatch === null) {
+        return volume;
+    }
+
+    const longSyntax = {
+        type: isNamedVolume(volumeMatch.groups.volume) ? 'volume' : 'bind',
+        source: volumeMatch.groups.volume,
+        target: volumeMatch.groups.container_path,
+    };
+
+    const flags = (volumeMatch.groups.flags || '').replace(/\s+/, '').split(',');
+    if (flags.includes('ro')) {
+        longSyntax.volume = { nocopy: true };
+    }
+
+    if (flags.includes('z')) {
+        longSyntax.bind = { selinux: 'z' };
+    } else if (flags.includes('Z')) {
+        longSyntax.bind = { selinux: 'Z' };
+    }
+
+    return longSyntax;
+};
+
 export const yamlCheck = (content: string) => {
     const doc = yaml.parseDocument(content, { prettyErrors: true });
     const logs = [];
@@ -43,6 +121,41 @@ const yamlStringify = (data: any, configuration?: Configuration = null) => {
     applyExpansions(data, configuration);
     return yaml.stringify(data, { indent: 4, simpleKeys: true }).trim();
 };
+
+interface Configuration {
+    expandVolumes?: boolean;
+    expandPorts?: boolean;
+}
+
+const applyExpansions = (data: any, configuration?: Configuration = null) => {
+    if (configuration && configuration.expandVolumes) {
+        Object.values(data.services).forEach((service) => {
+            if (service.volumes) {
+                for (let volumeIndex = 0; volumeIndex < service.volumes.length; volumeIndex += 1) {
+                    if (typeof service.volumes[volumeIndex] === 'string') {
+                        service.volumes[volumeIndex] = getVolumeLongSyntaxFromVolumeSpec(service.volumes[volumeIndex]);
+                    }
+                }
+            }
+        });
+    }
+
+    if (configuration && configuration.expandPorts) {
+        Object.values(data.services).forEach((service) => {
+            if (service.ports) {
+                for (let portIndex = 0; portIndex < service.ports.length; portIndex += 1) {
+                    if (typeof service.ports[portIndex] === 'string') {
+                        service.ports[portIndex] = getPortLongSyntaxFromPortSpec(service.ports[portIndex]);
+                    }
+                }
+            }
+        });
+    }
+
+    return data;
+};
+
+export const migrateFromV2xToV3x = (content: string, configuration?: Configuration = null) => {
     const data = yamlParse(content);
     if (!data.version || data.version.startsWith('3')) return content;
 
@@ -116,7 +229,7 @@ const yamlStringify = (data: any, configuration?: Configuration = null) => {
  * Migrate from Docker Compose 3.x to 2.x
  */
 
-export const migrateFromV3xToV2x = content => {
+export const migrateFromV3xToV2x = (content: string, configuration?: Configuration = null) => {
     const data = yamlParse(content);
     if (!data.version || data.version.startsWith('2')) return content;
 
@@ -224,13 +337,11 @@ function rewriteVolumesFrom(service: any, serviceNames: string[]) {
 
 function getNamedVolumes(services: any) {
     const volumeSpecs = [];
-    Object.values(services).forEach(service => (service.volumes || []).forEach(volume => volumeSpecs.push(volume)));
-
-    const isNamedVolume = source => source && !source.includes('/') && !source.includes('\\') && !source.includes('$');
+    Object.values(services).forEach((service) => (service.volumes || []).forEach((volume) => volumeSpecs.push(volume)));
 
     const names = new Set(
-        volumeSpecs.map(spec => {
-            const source = spec.split(':')[0];
+        volumeSpecs.map((spec) => {
+            const source = getVolumeNameFromVolumeSpec(spec);
             return isNamedVolume(source) ? source : undefined;
         }),
     );
@@ -251,7 +362,7 @@ function createVolumesSection(data: any, log: (msg: string) => void) {
     }
 }
 
-export const migrateFromV1ToV2x = content => {
+export const migrateFromV1ToV2x = (content: string, configuration?: Configuration = null) => {
     const data = yamlParse(content);
 
     if (data.services) return content;
@@ -291,8 +402,8 @@ export const migrateFromV1ToV2x = content => {
  * Migrate from Docker Compose to V2 CommonSpec
  */
 
-export const migrateToCommonSpec = content => {
-    const result = migrateFromV1ToV2x(content);
+export const migrateToCommonSpec = (content: string, configuration?: Configuration = null) => {
+    const result = migrateFromV1ToV2x(content, configuration);
 
     const data = yamlParse(result);
     if (!data.version) return result;
@@ -332,4 +443,6 @@ module.exports = {
     migrateFromV3xToV2x,
     migrateFromV2xToV3x,
     yamlCheck,
+    getVolumeNameFromVolumeSpec,
+    isNamedVolume,
 };
