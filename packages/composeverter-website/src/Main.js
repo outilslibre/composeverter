@@ -60,7 +60,7 @@ export default class Main extends Component {
     }
 
     updateConversion() {
-        this.setState(state => {
+        this.setState((state) => {
             try {
                 return {
                     output: doConversion(state.conversion, state.input),

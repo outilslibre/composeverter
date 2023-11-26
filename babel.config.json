@@ -10,7 +10,8 @@
         "modules": false
       }
     ],
-    "@babel/preset-flow"
+    "@babel/preset-flow",
+    "@babel/preset-react"
   ],
   "env": {
     "test": {

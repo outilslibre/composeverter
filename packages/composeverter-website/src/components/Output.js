@@ -22,7 +22,7 @@ const Blurb = styled.div`
     margin-bottom: 10px;
 `;
 
-export default props => (
+export default (props) => (
     <Section border>
         <Label>Output</Label>
         <Blurb>
@@ -34,10 +34,15 @@ export default props => (
                 <a href="https://docs.docker.com/compose/compose-file/" rel="noopener noreferrer" target="_blank">
                     Docker compose format
                 </a>{' '}
-                documentation and the {' '}
-                <a href="https://docs.docker.com/compose/compose-file/compose-versioning/#upgrading" rel="noopener noreferrer" target="_blank">
+                documentation and the{' '}
+                <a
+                    href="https://docs.docker.com/compose/compose-file/compose-versioning/#upgrading"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                >
                     Upgrading guide
-                </a>.
+                </a>
+                .
             </p>
         </Blurb>
         <pre style={{ color: 'red' }}>{props.error}</pre>

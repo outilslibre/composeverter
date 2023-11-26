@@ -1,4 +1,6 @@
-import yaml from 'yaml';
+/* @flow */
+
+const yaml = require('yaml');
 
 yaml.scalarOptions.null.nullStr = '';
 
@@ -6,7 +8,7 @@ yaml.scalarOptions.null.nullStr = '';
  * Migrate from Docker Compose 2.x to 3.x
  */
 
-const setDeepValue = (obj, path, value) => {
+const setDeepValue = (obj: any, path: string, value: any) => {
     let schema = obj; // a moving reference to internal objects within obj
     const pList = path.split('/');
     const len = pList.length;
@@ -24,15 +26,16 @@ export const migrateFromV2xToV3x = content => {
     if (!data.version || data.version.startsWith('3')) return content;
 
     const logs = [];
-    const log = message => logs.push(message);
+    const log = (message) => logs.push(message);
 
-    Object.keys(data.services).forEach(name => {
+    Object.keys(data.services).forEach((name) => {
         const service = data.services[name];
         if (service.cpus) setDeepValue(service, 'deploy/resources/limits/cpus', service.cpus);
         if (service.mem_limit) setDeepValue(service, 'deploy/resources/limits/memory', service.mem_limit);
         if (service.pids_limit) setDeepValue(service, 'deploy/resources/limits/pids', service.pids_limit);
-        if (service.mem_reservation)
+        if (service.mem_reservation) {
             setDeepValue(service, 'deploy/resources/reservations/memory', service.mem_reservation);
+        }
 
         if (service.volume_driver) {
             log(
@@ -49,7 +52,7 @@ export const migrateFromV2xToV3x = content => {
         }
 
         const unkProperties = ['cpu_shares', 'cpu_quota', 'cpuset', 'memswap_limit'];
-        unkProperties.forEach(k => {
+        unkProperties.forEach((k) => {
             if (Object.prototype.hasOwnProperty.call(service, k)) {
                 log(
                     `Service ${name} has ${k}:${service.k} These have been replaced by the resources key under deploy (https://docs.docker.com/compose/compose-file/compose-file-v3/#resources). deploy configuration only takes effect when using docker stack deploy, and is ignored by docker-compose.`,
@@ -82,7 +85,7 @@ export const migrateFromV2xToV3x = content => {
     // TODO : link_local_ips in networks: This option has not been introduced in version: "3.x" Compose files.
 
     return (
-        logs.map(m => `# ${m.replace(/\n/g, '\n#')}`).join('\n') +
+        logs.map((m) => `# ${m.replace(/\n/g, '\n#')}`).join('\n') +
         (logs.length > 0 ? '\n' : '') +
         yaml.stringify(data, { indent: 4, simpleKeys: true }).trim()
     );
@@ -96,7 +99,7 @@ export const migrateFromV3xToV2x = content => {
     const data = yaml.parse(content);
     if (!data.version || data.version.startsWith('2')) return content;
 
-    Object.keys(data.services).forEach(name => {
+    Object.keys(data.services).forEach((name) => {
         const service = data.services[name];
         if (service.deploy && service.deploy.resources) {
             const { resources } = service.deploy;
@@ -130,7 +133,7 @@ export const migrateFromV3xToV2x = content => {
  * taken from https://github.com/dnephin/compose/blob/master/contrib/migration/migrate-compose-file-v1-to-v2.py
  */
 
-function warnForLinks(name, service, log) {
+function warnForLinks(name: string, service: any, log: (msg: string) => void) {
     const { links } = service;
     if (links) {
         const exampleService = links[0].split(':')[0];
@@ -140,7 +143,7 @@ function warnForLinks(name, service, log) {
     }
 }
 
-function warnForExternalLinks(name, service, log) {
+function warnForExternalLinks(name: string, service: any, log: (msg: string) => void) {
     const externalLinks = service.external_links;
     if (externalLinks) {
         log(
@@ -149,7 +152,7 @@ function warnForExternalLinks(name, service, log) {
     }
 }
 
-function rewriteNet(service, serviceNames) {
+function rewriteNet(service: any, serviceNames: string[]) {
     if (service.net) {
         let networkMode = service.net;
 
@@ -166,7 +169,7 @@ function rewriteNet(service, serviceNames) {
     }
 }
 
-function rewriteBuild(service) {
+function rewriteBuild(service: any) {
     if (service.dockerfile) {
         service.build = {
             context: service.build,
@@ -176,7 +179,7 @@ function rewriteBuild(service) {
     }
 }
 
-function rewriteLogging(service) {
+function rewriteLogging(service: any) {
     if (service.log_driver) {
         service.logging = { driver: service.log_driver };
         if (service.log_opt) {
@@ -187,7 +190,7 @@ function rewriteLogging(service) {
     }
 }
 
-function rewriteVolumesFrom(service, serviceNames) {
+function rewriteVolumesFrom(service: any, serviceNames: string[]) {
     if (service.volumes_from) {
         for (let idx = 0; idx < service.volumes_from.length; idx += 1) {
             const volumeFrom = service.volumes_from[idx];
@@ -198,7 +201,7 @@ function rewriteVolumesFrom(service, serviceNames) {
     }
 }
 
-function getNamedVolumes(services) {
+function getNamedVolumes(services: any) {
     const volumeSpecs = [];
     Object.values(services).forEach(service => (service.volumes || []).forEach(volume => volumeSpecs.push(volume)));
 
@@ -216,7 +219,7 @@ function getNamedVolumes(services) {
         .map(name => ({ external: true, name }));
 }
 
-function createVolumesSection(data, log) {
+function createVolumesSection(data: any, log: (msg: string) => void) {
     const namedVolumes = getNamedVolumes(data.services);
     if (namedVolumes.length > 0) {
         log(
@@ -234,9 +237,9 @@ export const migrateFromV1ToV2x = content => {
     const serviceNames = Object.keys(data);
 
     const logs = [];
-    const log = message => logs.push(message);
+    const log = (message) => logs.push(message);
 
-    Object.keys(data).forEach(name => {
+    Object.keys(data).forEach((name) => {
         warnForLinks(name, data[name], log);
         warnForExternalLinks(name, data[name], log);
         rewriteNet(data[name], serviceNames);
@@ -246,7 +249,7 @@ export const migrateFromV1ToV2x = content => {
     });
 
     const services = {};
-    Object.keys(data).forEach(name => {
+    Object.keys(data).forEach((name) => {
         services[name] = data[name];
         delete data[name];
     });
@@ -256,7 +259,7 @@ export const migrateFromV1ToV2x = content => {
     createVolumesSection(data, log);
 
     return (
-        logs.map(m => `# ${m.replace(/\n/g, '\n#')}`).join('\n') +
+        logs.map((m) => `# ${m.replace(/\n/g, '\n#')}`).join('\n') +
         (logs.length > 0 ? '\n' : '') +
         yaml.stringify(data, { indent: 4, simpleKeys: true }).trim()
     );
@@ -275,13 +278,14 @@ export const migrateToCommonSpec = content => {
     const logs = result.match(/^\s*#[^\r\n]*/gm) || [];
     // const log = message => logs.push(message);
 
-    Object.keys(data.services).forEach(name => {
+    Object.keys(data.services).forEach((name) => {
         const service = data.services[name];
         if (service.cpus) setDeepValue(service, 'deploy/resources/limits/cpus', service.cpus);
         if (service.mem_limit) setDeepValue(service, 'deploy/resources/limits/memory', service.mem_limit);
         if (service.pids_limit) setDeepValue(service, 'deploy/resources/limits/pids', service.pids_limit);
-        if (service.mem_reservation)
+        if (service.mem_reservation) {
             setDeepValue(service, 'deploy/resources/reservations/memory', service.mem_reservation);
+        }
 
         delete service.cpus;
         delete service.mem_limit;
@@ -294,7 +298,7 @@ export const migrateToCommonSpec = content => {
     delete output.version;
 
     return (
-        logs.map(m => `# ${m.replace(/^\s*#\s+/g, '')}`).join('\n') +
+        logs.map((m) => `# ${m.replace(/^\s*#\s+/g, '')}`).join('\n') +
         (logs.length > 0 ? '\n' : '') +
         yaml.stringify(output, { indent: 4, simpleKeys: true }).trim()
     );
