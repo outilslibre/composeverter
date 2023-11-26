@@ -22,7 +22,16 @@ const setDeepValue = (obj: any, path: string, value: any) => {
 };
 
 export const migrateFromV2xToV3x = content => {
-    const data = yaml.parse(content);
+
+const yamlParse = (content: string) => {
+    return yaml.parse(content);
+};
+
+const yamlStringify = (data: any, configuration?: Configuration = null) => {
+    applyExpansions(data, configuration);
+    return yaml.stringify(data, { indent: 4, simpleKeys: true }).trim();
+};
+    const data = yamlParse(content);
     if (!data.version || data.version.startsWith('3')) return content;
 
     const logs = [];
@@ -87,7 +96,7 @@ export const migrateFromV2xToV3x = content => {
     return (
         logs.map((m) => `# ${m.replace(/\n/g, '\n#')}`).join('\n') +
         (logs.length > 0 ? '\n' : '') +
-        yaml.stringify(data, { indent: 4, simpleKeys: true }).trim()
+        yamlStringify(data, configuration)
     );
 };
 
@@ -96,7 +105,7 @@ export const migrateFromV2xToV3x = content => {
  */
 
 export const migrateFromV3xToV2x = content => {
-    const data = yaml.parse(content);
+    const data = yamlParse(content);
     if (!data.version || data.version.startsWith('2')) return content;
 
     Object.keys(data.services).forEach((name) => {
@@ -125,7 +134,7 @@ export const migrateFromV3xToV2x = content => {
 
     data.version = '2.4';
 
-    return yaml.stringify(data, { indent: 4, simpleKeys: true }).trim();
+    return yamlStringify(data, configuration);
 };
 
 /** ***************************************
@@ -230,7 +239,7 @@ function createVolumesSection(data: any, log: (msg: string) => void) {
 }
 
 export const migrateFromV1ToV2x = content => {
-    const data = yaml.parse(content);
+    const data = yamlParse(content);
 
     if (data.services) return content;
 
@@ -261,7 +270,7 @@ export const migrateFromV1ToV2x = content => {
     return (
         logs.map((m) => `# ${m.replace(/\n/g, '\n#')}`).join('\n') +
         (logs.length > 0 ? '\n' : '') +
-        yaml.stringify(data, { indent: 4, simpleKeys: true }).trim()
+        yamlStringify(data, configuration)
     );
 };
 
@@ -272,7 +281,7 @@ export const migrateFromV1ToV2x = content => {
 export const migrateToCommonSpec = content => {
     const result = migrateFromV1ToV2x(content);
 
-    const data = yaml.parse(result);
+    const data = yamlParse(result);
     if (!data.version) return result;
 
     const logs = result.match(/^\s*#[^\r\n]*/gm) || [];
@@ -300,7 +309,7 @@ export const migrateToCommonSpec = content => {
     return (
         logs.map((m) => `# ${m.replace(/^\s*#\s+/g, '')}`).join('\n') +
         (logs.length > 0 ? '\n' : '') +
-        yaml.stringify(output, { indent: 4, simpleKeys: true }).trim()
+        yamlStringify(output, configuration)
     );
 };
 
