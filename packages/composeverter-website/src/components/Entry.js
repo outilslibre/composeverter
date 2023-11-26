@@ -6,6 +6,7 @@ import Section from './Section';
 import TextInput from './TextInput';
 import Code from './Code';
 import CarbonAds from './CarbonAds';
+import Checkbox from './Checkbox';
 
 const Blurb = styled.div`
     line-height: 32px;
@@ -75,6 +76,24 @@ export default function Entry(props) {
                         options={options}
                         value={options.filter(({ value }) => value === props.conversion)}
                     />
+                    <div
+                        css={`
+                            display: flex;
+                        `}
+                    >
+                        <Checkbox
+                            label="Expand Volumes"
+                            value={props.expandVolumes}
+                            onChange={props.onExpandVolumesChange}
+                            style={{ margin: '5pt' }}
+                        />
+                        <Checkbox
+                            label="Expand Ports"
+                            value={props.expandPorts}
+                            onChange={props.onExpandPortsChange}
+                            style={{ margin: '5pt' }}
+                        />
+                    </div>
                 </div>
                 <div
                     css={`

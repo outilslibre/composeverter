@@ -18,17 +18,21 @@ nginx:
         - '/var/run/docker.sock:/tmp/docker.sock:ro'
     image: nginx`;
 
-const doConversion = (conversion, input) => {
+const doConversion = (conversion, input, config) => {
     if (conversion === 'latest') {
-        return Composeverter.migrateToCommonSpec(input);
-    } if (conversion === 'v1ToV2x') {
-        return Composeverter.migrateFromV1ToV2x(input);
-    } if (conversion === 'v1ToV3x') {
-        return Composeverter.migrateFromV2xToV3x(Composeverter.migrateFromV1ToV2x(input));
-    } if (conversion === 'v2xToV3x') {
-        return Composeverter.migrateFromV2xToV3x(input);
-    } if (conversion === 'v3xToV2x') {
-        return Composeverter.migrateFromV3xToV2x(input);
+        return Composeverter.migrateToCommonSpec(input, config);
+    }
+    if (conversion === 'v1ToV2x') {
+        return Composeverter.migrateFromV1ToV2x(input, config);
+    }
+    if (conversion === 'v1ToV3x') {
+        return Composeverter.migrateFromV2xToV3x(Composeverter.migrateFromV1ToV2x(input), config);
+    }
+    if (conversion === 'v2xToV3x') {
+        return Composeverter.migrateFromV2xToV3x(input, config);
+    }
+    if (conversion === 'v3xToV2x') {
+        return Composeverter.migrateFromV3xToV2x(input, config);
     }
     throw new Error(`Unknown conversion '${conversion}'`);
 };
@@ -40,9 +44,13 @@ export default class Main extends Component {
             input: defaultCommand,
             output: doConversion('latest', defaultCommand),
             conversion: 'latest',
+            expandVolumes: false,
+            expandPorts: false,
         };
         this.onInputChange = this.onInputChange.bind(this);
         this.onSelectChange = this.onSelectChange.bind(this);
+        this.onExpandVolumesChange = this.onExpandVolumesChange.bind(this);
+        this.onExpandPortsChange = this.onExpandPortsChange.bind(this);
     }
 
     onInputChange(value) {
@@ -59,11 +67,28 @@ export default class Main extends Component {
         this.updateConversion();
     }
 
+    onExpandVolumesChange(e) {
+        this.setState({
+            expandVolumes: e.target.checked,
+        });
+        this.updateConversion();
+    }
+
+    onExpandPortsChange(e) {
+        this.setState({
+            expandPorts: e.target.checked,
+        });
+        this.updateConversion();
+    }
+
     updateConversion() {
         this.setState((state) => {
             try {
                 return {
-                    output: doConversion(state.conversion, state.input),
+                    output: doConversion(state.conversion, state.input, {
+                        expandPorts: state.expandPorts,
+                        expandVolumes: state.expandVolumes,
+                    }),
                     error: '',
                 };
             } catch (e) {
@@ -81,8 +106,12 @@ export default class Main extends Component {
                 <Entry
                     input={this.state.input}
                     conversion={this.state.conversion}
+                    expandVolumes={this.state.expandVolumes}
+                    expandPorts={this.state.expandPorts}
                     onInputChange={this.onInputChange}
                     onSelectChange={this.onSelectChange}
+                    onExpandPortsChange={this.onExpandPortsChange}
+                    onExpandVolumesChange={this.onExpandVolumesChange}
                 />
                 <div style={{ marginTop: '1em' }}>
                     <Output output={this.state.output} error={this.state.error} />
