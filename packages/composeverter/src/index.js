@@ -231,8 +231,9 @@ function getNamedVolumes(services: any) {
 function createVolumesSection(data: any, log: (msg: string) => void) {
     const namedVolumes = getNamedVolumes(data.services);
     if (namedVolumes.length > 0) {
+        const namedVolumesNames = namedVolumes.map((v) => JSON.stringify(v)).join(',');
         log(
-            `Named volumes (${namedVolumes}) must be explicitly declared. Creating a 'volumes' section with declarations.\n\nFor backwards-compatibility, they've been declared as external. If you don't mind the volume names being prefixed with the project name, you can remove the 'external' option from each one.`,
+            `Named volumes (${namedVolumesNames}) must be explicitly declared. Creating a 'volumes' section with declarations.\n\nFor backwards-compatibility, they've been declared as external. If you don't mind the volume names being prefixed with the project name, you can remove the 'external' option from each one.`,
         );
         data.volumes = namedVolumes;
     }

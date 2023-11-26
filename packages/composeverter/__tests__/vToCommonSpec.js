@@ -34,9 +34,6 @@ db:
   image: postgresql
 `),
     ).toMatchInlineSnapshot(`
-        "# Named volumes ([object Object]) must be explicitly declared. Creating a 'volumes' section with declarations.
-        # #
-        # #For backwards-compatibility, they've been declared as external. If you don't mind the volume names being prefixed with the project name, you can remove the 'external' option from each one.
         name: <your project name>
         services:
             myapp:
@@ -46,6 +43,9 @@ db:
                 network_mode: service:db
             db:
                 image: postgresql
+"# Named volumes ({\\"data\\":{\\"external\\":true,\\"name\\":\\"data\\"}}) must be explicitly declared. Creating a 'volumes' section with declarations.
+# #
+# #For backwards-compatibility, they've been declared as external. If you don't mind the volume names being prefixed with the project name, you can remove the 'external' option from each one.
         volumes:
             - external: true
               name: data"
