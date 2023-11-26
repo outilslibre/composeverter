@@ -34,22 +34,23 @@ db:
   image: postgresql
 `),
     ).toMatchInlineSnapshot(`
-        name: <your project name>
-        services:
-            myapp:
-                image: myapp-image
-                volumes:
-                    - data:/app/data
-                network_mode: service:db
-            db:
-                image: postgresql
 "# Named volumes ({\\"data\\":{\\"external\\":true,\\"name\\":\\"data\\"}}) must be explicitly declared. Creating a 'volumes' section with declarations.
 # #
 # #For backwards-compatibility, they've been declared as external. If you don't mind the volume names being prefixed with the project name, you can remove the 'external' option from each one.
+name: <your project name>
+services:
+    myapp:
+        image: myapp-image
         volumes:
-            - external: true
-              name: data"
-    `);
+            - data:/app/data
+        network_mode: service:db
+    db:
+        image: postgresql
+volumes:
+    - data:
+          external: true
+          name: data"
+`);
 });
 
 test('no convert if already CommonSpec', () => {

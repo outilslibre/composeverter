@@ -224,8 +224,8 @@ function getNamedVolumes(services: any) {
     );
 
     return Array.from(names)
-        .filter(name => name)
-        .map(name => ({ external: true, name }));
+        .filter((name) => name)
+        .map((name) => ({ [name]: { external: true, name } }));
 }
 
 function createVolumesSection(data: any, log: (msg: string) => void) {

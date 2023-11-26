@@ -180,19 +180,20 @@ myapp:
     - data:/app/data
 `),
     ).toMatchInlineSnapshot(`
-        version: \\"2.4\\"
-        services:
-            myapp:
-                image: myapp-image
-                volumes:
-                    - data:/app/data
 "# Named volumes ({\\"data\\":{\\"external\\":true,\\"name\\":\\"data\\"}}) must be explicitly declared. Creating a 'volumes' section with declarations.
 #
 #For backwards-compatibility, they've been declared as external. If you don't mind the volume names being prefixed with the project name, you can remove the 'external' option from each one.
+version: \\"2.4\\"
+services:
+    myapp:
+        image: myapp-image
         volumes:
-            - external: true
-              name: data"
-    `);
+            - data:/app/data
+volumes:
+    - data:
+          external: true
+          name: data"
+`);
 });
 
 test('no conversion from V1 if V3', () => {
