@@ -22,17 +22,35 @@ const setDeepValue = (obj: any, path: string, value: any) => {
 };
 
 const portSpecRegex =
-    /^((\[?(?<ip>[a-fA-F\d.:]+)\]?:)?(?<host>[\d]*(-[\d]+)?):)?(?<container>[\d]+(-[\d]+)?)(\/(?<proto>(udp|tcp|sctp)))?$/;
+    /^((?<ip_part>\[?(?<ip>[a-fA-F\d.:]+)\]?:)?(?<host>[\d]*(-[\d]+)?):)?(?<container>[\d]+(-[\d]+)?)(?<proto_part>\/(?<proto>(udp|tcp|sctp)))?$/;
 
 export const getPortLongSyntaxFromPortSpec = (ports: string) => {
     const portMatch = ports.match(portSpecRegex);
     if (portMatch === null) {
-        return ports;
+        return [ports];
     }
 
     const target = portMatch.groups.container;
     if (target && target.includes('-')) {
-        return ports;
+        const targetRange = target.split('-');
+        const targetStart = parseInt(targetRange[0], 10);
+        const targetStop = parseInt(targetRange[1], 10);
+        const { host } = portMatch.groups;
+        const hostRange = (host || target).split('-');
+        const hostStart = parseInt(hostRange[0], 10);
+
+        let rangePorts = [];
+        Array.from({ length: targetStop - targetStart + 1 }, (_, i) => i).forEach((i) => {
+            rangePorts = [
+                ...rangePorts,
+                ...getPortLongSyntaxFromPortSpec(
+                    `${portMatch.groups.ip_part || ''}${hostStart + i}:${targetStart + i}${
+                        portMatch.groups.proto_part || ''
+                    }`,
+                ),
+            ];
+        });
+        return rangePorts;
     }
 
     const longSyntax = { target: parseInt(target, 10) };
@@ -51,7 +69,7 @@ export const getPortLongSyntaxFromPortSpec = (ports: string) => {
 
     longSyntax.mode = 'ingress';
 
-    return longSyntax;
+    return [longSyntax];
 };
 
 const volumeSpecRegex =
@@ -143,11 +161,13 @@ const applyExpansions = (data: any, configuration?: Configuration) => {
     if (configuration && configuration.expandPorts) {
         Object.values(data.services).forEach((service) => {
             if (service.ports) {
+                let ports = [];
                 for (let portIndex = 0; portIndex < service.ports.length; portIndex += 1) {
                     if (typeof service.ports[portIndex] === 'string') {
-                        service.ports[portIndex] = getPortLongSyntaxFromPortSpec(service.ports[portIndex]);
-                    }
+                        ports = [...ports, ...getPortLongSyntaxFromPortSpec(service.ports[portIndex])];
+                    } else ports = [...ports, service.ports[portIndex]];
                 }
+                service.ports = ports;
             }
         });
     }

@@ -30,6 +30,9 @@ myapp:
     - "127.0.0.1:5000-5010:5000-5010"
     - "6060:6060/udp"
     - notvalid
+    - target: 4444
+      protocol: udp
+      mode: ingress
 db:
   image: postgresql
 `,
@@ -78,11 +81,33 @@ services:
             - target: 4000
               protocol: udp
               mode: ingress
-            - 3000-3005
+            - target: 3000
+              published: \\"3000\\"
+              mode: ingress
+            - target: 3001
+              published: \\"3001\\"
+              mode: ingress
+            - target: 3002
+              published: \\"3002\\"
+              mode: ingress
+            - target: 3003
+              published: \\"3003\\"
+              mode: ingress
+            - target: 3004
+              published: \\"3004\\"
+              mode: ingress
+            - target: 3005
+              published: \\"3005\\"
+              mode: ingress
             - target: 8000
               published: \\"8000\\"
               mode: ingress
-            - 9090-9091:8080-8081
+            - target: 8080
+              published: \\"9090\\"
+              mode: ingress
+            - target: 8081
+              published: \\"9091\\"
+              mode: ingress
             - target: 22
               published: \\"49100\\"
               mode: ingress
@@ -93,12 +118,58 @@ services:
               host_ip: 127.0.0.1
               published: \\"8001\\"
               mode: ingress
-            - 127.0.0.1:5000-5010:5000-5010
+            - target: 5000
+              host_ip: 127.0.0.1
+              published: \\"5000\\"
+              mode: ingress
+            - target: 5001
+              host_ip: 127.0.0.1
+              published: \\"5001\\"
+              mode: ingress
+            - target: 5002
+              host_ip: 127.0.0.1
+              published: \\"5002\\"
+              mode: ingress
+            - target: 5003
+              host_ip: 127.0.0.1
+              published: \\"5003\\"
+              mode: ingress
+            - target: 5004
+              host_ip: 127.0.0.1
+              published: \\"5004\\"
+              mode: ingress
+            - target: 5005
+              host_ip: 127.0.0.1
+              published: \\"5005\\"
+              mode: ingress
+            - target: 5006
+              host_ip: 127.0.0.1
+              published: \\"5006\\"
+              mode: ingress
+            - target: 5007
+              host_ip: 127.0.0.1
+              published: \\"5007\\"
+              mode: ingress
+            - target: 5008
+              host_ip: 127.0.0.1
+              published: \\"5008\\"
+              mode: ingress
+            - target: 5009
+              host_ip: 127.0.0.1
+              published: \\"5009\\"
+              mode: ingress
+            - target: 5010
+              host_ip: 127.0.0.1
+              published: \\"5010\\"
+              mode: ingress
             - target: 6060
               published: \\"6060\\"
               protocol: udp
               mode: ingress
             - notvalid
+            - target: 4444
+              protocol: udp
+              mode: ingress
         network_mode: service:db
     db:
         image: postgresql
