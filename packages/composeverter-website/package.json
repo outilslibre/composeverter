@@ -6,7 +6,7 @@
   "dependencies": {
     "babel-plugin-styled-components": "^1.10.7",
     "composeverter": "latest",
-    "html5-boilerplate": "^7.2.0",
+    "html5-boilerplate": "^9.0.0",
     "normalize.css": "^8.0.1",
     "react": "16.x",
     "react-copy-to-clipboard": "^5.0.1",

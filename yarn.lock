@@ -6917,10 +6917,10 @@ html-webpack-plugin@^5.5.0:
     pretty-error "^4.0.0"
     tapable "^2.0.0"
 
-html5-boilerplate@^7.2.0:
-  version "7.3.0"
-  resolved "https://registry.yarnpkg.com/html5-boilerplate/-/html5-boilerplate-7.3.0.tgz#263af972835d4536954424fbaabaa68bac586119"
-  integrity sha512-IHC/FzedeOweuJrU3rrhyJ9apnSPW5NGLS6562ryz0nXw9QtamT13SQ88/6PBkHhzfdy+gx0tqmO0yuwPpr00g==
+html5-boilerplate@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/html5-boilerplate/-/html5-boilerplate-9.0.0.tgz#178daf5759702ca6fac85cd386c0106f79439dba"
+  integrity sha512-hPYWh7F63/83bJ0oyum3UM5tfZmDy+vHvdCbbS0FgWKE2I8adKYnC7VLoJo/gzCI2c8TNuTOyuEGZRUobWlhSw==
 
 htmlparser2@^6.1.0:
   version "6.1.0"
