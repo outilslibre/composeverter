@@ -30,6 +30,26 @@ Implicit map keys need to be followed by map values at line 9, column 5"
 `);
 });
 
+test('invalid yaml 2', () => {
+    expect(() => {
+  migrateToCommonSpec(
+    `
+myapp:
+  image: myapp-image
+  volumes: 
+    - data:/app/data
+    - '/data:/app/data
+db:
+  image: postgresql`,
+    { expandVolumes: true, expandPorts: true }
+  );
+}).toThrowErrorMatchingInlineSnapshot(`
+"Missing closing 'quote at line 6, column 7
+Multi-line single-quoted string needs to be sufficiently indented at line 6, column 7
+Multi-line single-quoted string needs to be sufficiently indented at line 6, column 7"
+`);
+});
+
 test('v1 to CommonSpec, custom indent 2', () => {
     expect(
         migrateToCommonSpec(
