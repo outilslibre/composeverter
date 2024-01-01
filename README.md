@@ -19,10 +19,6 @@ See [NPM package](https://www.npmjs.com/package/composeverter)
 - Make your changes, and build the project by running `make build`
 - Test your changes with `make test`
 
-### yarn version
-
-Needs yarn@1.19.1. See https://github.com/yarnpkg/yarn/issues/7734.
-
 ## Maintainers
 
 - ShareVB [GitHub](https://github.com/sharevb)
