@@ -145,6 +145,23 @@ Check YAML validity and return the parsed object if YAML is valid.
 **Parameters:**
 - `yaml`: A string representing the YAML content to be checked.
 
+**Throws: **
+
+Throws `YamlSyntaxError` if parsing errors occurred. This class has the following members :
+- `message`: concatenated error messages
+- `lines`: line numbers that have errors
+- `details`: array of messages with the following structure: 
+```typescript
+{
+  line: number, 
+  message: string, 
+  pos: {
+    start: { line: number, col: number }, 
+    end: { line: number, col: number }
+  }
+}
+```
+
 **Returns:**
 The parsed object if the YAML is valid.
 
