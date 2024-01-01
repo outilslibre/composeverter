@@ -22,7 +22,7 @@
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^27.4.3",
-    "jest": "^27.4.3",
+    "jest": "^29.7.0",
     "rollup": "4.x",
     "rollup-plugin-node-builtins": "2.x",
     "rollup-plugin-node-globals": "1.x",
