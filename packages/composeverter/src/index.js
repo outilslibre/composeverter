@@ -6,6 +6,7 @@ import { yamlParse } from './yamlparse';
 import { yamlStringify } from './yamlstringify';
 
 export { yamlCheck, yamlParse } from './yamlparse';
+export { validateDockerComposeToCommonSpec, getDockerComposeSchemaWithoutFormats } from './validate';
 export { getVolumeNameFromVolumeSpec, isNamedVolume } from './volumeutils';
 export { yamlStringify } from './yamlstringify';
 
@@ -303,4 +304,6 @@ export const migrateToCommonSpec = (content: string, configuration?: Configurati
     yamlCheck,
     getVolumeNameFromVolumeSpec,
     isNamedVolume,
+    validateDockerComposeToCommonSpec,
+    getDockerComposeSchemaWithoutFormats,
 }; */

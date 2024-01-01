@@ -6,6 +6,7 @@
 
 This NPM package provides a simple and convenient way to convert Docker Compose files from one version to another. Docker Compose files allow you to define and run multi-container Docker applications, but the format has evolved over time. With this package, you can easily migrate your Compose files between different versions.
 It also provides some functions to check YAML and test if a given Docker volume mapping is a named one.
+It also provides a function to validate a Docker Compose file against Docker Compose Common Specification.
 
 ## Installation
 
@@ -164,6 +165,29 @@ Throws `YamlSyntaxError` if parsing errors occurred. This class has the followin
 
 **Returns:**
 The parsed object if the YAML is valid.
+
+### `validateDockerComposeToCommonSpec(content: string): any`
+
+Check Docker Compose validity against Docker Compose Common Specification and returns validation errors.
+
+**Parameters:**
+- `content`: A string representing the Docker Compose content to be checked.
+
+**Returns:**
+- array of errors (`helpLink` is a potential link to Docker Compose documentation):
+```typescript
+{
+  line: number,
+  message: string,
+  helpLink: string
+}
+
+```
+
+
+### `getDockerComposeSchemaWithoutFormats(): any`
+
+Returns the Docker Compose Common Specification schema (with formats replaced with patterns)
 
 
 ## License
