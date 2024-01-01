@@ -4,7 +4,7 @@
   "name": "composeverter-website",
   "homepage": "https://www.composeverter.com",
   "dependencies": {
-    "babel-plugin-styled-components": "^1.10.7",
+    "babel-plugin-styled-components": "^2.1.4",
     "composeverter": "latest",
     "html5-boilerplate": "^7.2.0",
     "normalize.css": "^8.0.1",
