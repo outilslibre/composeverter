@@ -10,8 +10,7 @@ import Entry from './components/Entry';
 import Output from './components/Output';
 import Footer from './components/Footer';
 
-const defaultCommand = `
-nginx:
+const defaultCommand = `nginx:
     ports:
         - '80:80'
     volumes:
@@ -46,6 +45,7 @@ export default class Main extends Component {
             conversion: 'latest',
             expandVolumes: false,
             expandPorts: false,
+            erroredLines: [],
         };
         this.onInputChange = this.onInputChange.bind(this);
         this.onSelectChange = this.onSelectChange.bind(this);
@@ -90,10 +90,13 @@ export default class Main extends Component {
                         expandVolumes: state.expandVolumes,
                     }),
                     error: '',
+                    erroredLines: [],
                 };
             } catch (e) {
                 return {
                     error: e.toString(),
+                    output: '#see error message(s)',
+                    erroredLines: e.lines,
                 };
             }
         });
@@ -105,6 +108,8 @@ export default class Main extends Component {
                 <Header />
                 <Entry
                     input={this.state.input}
+                    erroredLines={this.state.erroredLines}
+                    error={this.state.error}
                     conversion={this.state.conversion}
                     expandVolumes={this.state.expandVolumes}
                     expandPorts={this.state.expandPorts}
@@ -114,7 +119,7 @@ export default class Main extends Component {
                     onExpandVolumesChange={this.onExpandVolumesChange}
                 />
                 <div style={{ marginTop: '1em' }}>
-                    <Output output={this.state.output} error={this.state.error} />
+                    <Output output={this.state.output} />
                 </div>
                 <Footer />
             </div>

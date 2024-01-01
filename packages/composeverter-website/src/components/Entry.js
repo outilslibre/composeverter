@@ -3,7 +3,7 @@ import styled from 'styled-components/macro';
 import Select from 'react-select';
 
 import Section from './Section';
-import TextInput from './TextInput';
+import LinedTextInput from './LinedTextInput';
 import Code from './Code';
 import CarbonAds from './CarbonAds';
 import Checkbox from './Checkbox';
@@ -69,7 +69,13 @@ export default function Entry(props) {
                             into the box below!
                         </p>
                     </Blurb>
-                    <TextInput value={props.input} rows={5} onInputChange={props.onInputChange} />
+                    <LinedTextInput
+                        erroredLines={props.erroredLines}
+                        value={props.input}
+                        numOfLines={5}
+                        onValueChange={props.onInputChange}
+                    />
+                    <pre style={{ color: 'red' }}>{props.error}</pre>
                     <span>Docker Compose version:</span>
                     <Select
                         onChange={props.onSelectChange}
