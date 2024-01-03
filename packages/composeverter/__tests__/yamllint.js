@@ -1,6 +1,11 @@
 /* eslint-env jest */
 
-import { migrateToCommonSpec, validateDockerComposeToCommonSpec } from '../src';
+import {
+    migrateToCommonSpec,
+    validateDockerComposeToCommonSpec,
+    migrateFromV3xToV2x,
+    migrateFromV2xToV3x,
+} from '../src';
 
 test('invalid yaml', () => {
     expect(() => {
@@ -32,8 +37,8 @@ Implicit map keys need to be followed by map values at line 9, column 5"
 
 test('invalid yaml 2', () => {
     expect(() => {
-  migrateToCommonSpec(
-    `
+        migrateToCommonSpec(
+            `
 myapp:
   image: myapp-image
   volumes: 
@@ -41,9 +46,9 @@ myapp:
     - '/data:/app/data
 db:
   image: postgresql`,
-    { expandVolumes: true, expandPorts: true }
-  );
-}).toThrowErrorMatchingInlineSnapshot(`
+            { expandVolumes: true, expandPorts: true },
+        );
+    }).toThrowErrorMatchingInlineSnapshot(`
 "Missing closing 'quote at line 6, column 7
 Multi-line single-quoted string needs to be sufficiently indented at line 6, column 7
 Multi-line single-quoted string needs to be sufficiently indented at line 6, column 7"
@@ -161,4 +166,82 @@ volumes:
     ).toMatchInlineSnapshot(
         `"[{\\"line\\":2,\\"message\\":\\"Line 2(/dontexists): 'dontexists' is unknown for '/dontexists'\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/\\"},{\\"line\\":33,\\"message\\":\\"Line 33(/networks/front-tier/truc): 'truc' is unknown for '/networks/front-tier/truc'\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/06-networks/#truc\\"},{\\"line\\":47,\\"message\\":\\"Line 47(/volumes/db_data/truc): 'truc' is unknown for '/volumes/db_data/truc'\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/07-volumes/#truc\\"},{\\"line\\":41,\\"message\\":\\"Line 41(/secrets/db_password/fiel): 'fiel' is unknown for '/secrets/db_password/fiel'\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/09-secrets/#fiel\\"},{\\"line\\":37,\\"message\\":\\"Line 37(/configs/http_config/fiel): 'fiel' is unknown for '/configs/http_config/fiel'\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/08-configs/#fiel\\"}]"`,
     );
+});
+
+test('invalid yaml (comment only)', () => {
+    expect(migrateToCommonSpec(`#az`, { expandVolumes: true, expandPorts: true })).toMatchInlineSnapshot(`"#az"`);
+});
+
+test('invalid yaml (string)', () => {
+    expect(migrateToCommonSpec(`foo bar`, { expandVolumes: true, expandPorts: true })).toMatchInlineSnapshot(
+        `"foo bar"`,
+    );
+});
+
+test('return empty when no services yaml', () => {
+    expect(
+        migrateToCommonSpec(`
+    version: '3.3'
+    services:
+  `),
+    ).toMatchInlineSnapshot(`
+"name: <your project name>
+services:"
+`);
+});
+
+test('invalid yaml 2x 3x (comment only)', () => {
+    expect(migrateFromV2xToV3x(`#az`, { expandVolumes: true, expandPorts: true })).toMatchInlineSnapshot(`"#az"`);
+});
+
+test('invalid yaml 2x 3x (string)', () => {
+    expect(migrateFromV2xToV3x(`foo bar`, { expandVolumes: true, expandPorts: true })).toMatchInlineSnapshot(
+        `"foo bar"`,
+    );
+});
+
+test('return empty when no services yaml 2x 3x', () => {
+    expect(
+        migrateFromV2xToV3x(`
+    # ignored : docker stop
+
+    version: '3.3'
+    services:
+  `),
+    ).toMatchInlineSnapshot(`
+"
+    # ignored : docker stop
+
+    version: '3.3'
+    services:
+  "
+`);
+});
+
+test('invalid yaml 3x 2x(comment only)', () => {
+    expect(migrateFromV3xToV2x(`#az`, { expandVolumes: true, expandPorts: true })).toMatchInlineSnapshot(`"#az"`);
+});
+
+test('invalid yaml 3x 2x (string)', () => {
+    expect(migrateFromV3xToV2x(`foo bar`, { expandVolumes: true, expandPorts: true })).toMatchInlineSnapshot(
+        `"foo bar"`,
+    );
+});
+
+test('return empty when no services yaml 3x 2x', () => {
+    expect(
+        migrateFromV3xToV2x(`
+    # ignored : docker stop
+
+    version: '3.3'
+    services:
+  `),
+    ).toMatchInlineSnapshot(`
+"
+    # ignored : docker stop
+
+    version: '3.3'
+    services:
+  "
+`);
 });

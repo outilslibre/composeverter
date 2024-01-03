@@ -16,6 +16,8 @@ export { yamlStringify } from './yamlstringify';
 
 export const migrateFromV2xToV3x = (content: string, configuration?: Configuration = null) => {
     const data = yamlParse(content);
+    if (!data) return content;
+    if (typeof data === 'string') return content;
     if (!data.version || data.version.startsWith('3')) return content;
 
     const logs = [];
@@ -90,7 +92,9 @@ export const migrateFromV2xToV3x = (content: string, configuration?: Configurati
 
 export const migrateFromV3xToV2x = (content: string, configuration?: Configuration = null) => {
     const data = yamlParse(content);
-    if (!data.version || data.version.startsWith('2')) return content;
+    if (!data) return content;
+    if (typeof data === 'string') return content;
+    if (!data.version || data.version.startsWith('2') || !data.services) return content;
 
     Object.keys(data.services).forEach((name) => {
         const service = data.services[name];
@@ -224,7 +228,9 @@ function createVolumesSection(data: any, log: (msg: string) => void) {
 export const migrateFromV1ToV2x = (content: string, configuration?: Configuration = null) => {
     const data = yamlParse(content);
 
-    if (data.services) return content;
+    if (!data) return content;
+    if (typeof data === 'string') return content;
+    if (Object.prototype.hasOwnProperty.call(data, 'services')) return content;
 
     const serviceNames = Object.keys(data);
 
@@ -265,12 +271,14 @@ export const migrateToCommonSpec = (content: string, configuration?: Configurati
     const result = migrateFromV1ToV2x(content, configuration);
 
     const data = yamlParse(result);
+    if (!data) return content;
+    if (typeof data === 'string') return content;
     if (!data.version) return result;
 
     const logs = result.match(/^\s*#[^\r\n]*/gm) || [];
     // const log = message => logs.push(message);
 
-    Object.keys(data.services).forEach((name) => {
+    Object.keys(data.services || []).forEach((name) => {
         const service = data.services[name];
         if (service.cpus) setDeepValue(service, 'deploy/resources/limits/cpus', service.cpus);
         if (service.mem_limit) setDeepValue(service, 'deploy/resources/limits/memory', service.mem_limit);
