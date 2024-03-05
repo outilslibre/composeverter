@@ -12,3 +12,13 @@ export const setDeepValue = (obj: any, path: string, value: any) => {
 
     schema[pList[len - 1]] = value;
 };
+
+export function handleExternalName(compose: any, part: 'networks' | 'volumes') {
+    Object.keys(compose[part] || []).forEach((name) => {
+        const partObj = compose[part][name];
+        if (partObj.external && partObj.external.name) {
+            partObj.name = partObj.external.name;
+            partObj.external = true;
+        }
+    });
+}

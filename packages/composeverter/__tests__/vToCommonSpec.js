@@ -65,16 +65,14 @@ services:
     image: postgresql
 `),
     ).toMatchInlineSnapshot(`
-        "
-        name: xxx
-        services:
-          myapp:
-            image: myapp-image
-            net: container:db
-          db:
-            image: postgresql
-        "
-    `);
+"name: xxx
+services:
+    myapp:
+        image: myapp-image
+        net: container:db
+    db:
+        image: postgresql"
+`);
 });
 
 test('v3 to CommonSpec', () => {
@@ -141,4 +139,42 @@ services:
                         reservations:
                             memory: 12G"
     `);
+});
+
+test('update external networks and volumes', () => {
+    expect(
+        migrateToCommonSpec(`
+name: xxx
+services:
+  myapp:
+    image: myapp-image
+    net: container:db
+  db:
+    image: postgresql
+networks:
+  some_net:
+    external:
+      name: some_net
+volumes:
+  some_vol:
+    external:
+      name: some_vol
+`),
+    ).toMatchInlineSnapshot(`
+"name: xxx
+services:
+    myapp:
+        image: myapp-image
+        net: container:db
+    db:
+        image: postgresql
+networks:
+    some_net:
+        external: true
+        name: some_net
+volumes:
+    some_vol:
+        external: true
+        name: some_vol"
+`);
 });
