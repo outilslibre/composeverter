@@ -1,6 +1,6 @@
 /* @flow */
 
-import { setDeepValue } from './utils';
+import { setDeepValue, handleExternalName } from './utils';
 import { getVolumeNameFromVolumeSpec, isNamedVolume } from './volumeutils';
 import { yamlParse } from './yamlparse';
 import { yamlStringify } from './yamlstringify';
@@ -76,6 +76,8 @@ export const migrateFromV2xToV3x = (content: string, configuration?: Configurati
     });
 
     data.version = '3';
+    handleExternalName(data, 'networks');
+    handleExternalName(data, 'volumes');
 
     // TODO : link_local_ips in networks: This option has not been introduced in version: "3.x" Compose files.
 
@@ -121,6 +123,9 @@ export const migrateFromV3xToV2x = (content: string, configuration?: Configurati
     });
 
     data.version = '2.4';
+
+    handleExternalName(data, 'networks');
+    handleExternalName(data, 'volumes');
 
     return yamlStringify(data, configuration);
 };
@@ -256,6 +261,9 @@ export const migrateFromV1ToV2x = (content: string, configuration?: Configuratio
     data.services = services;
     createVolumesSection(data, log);
 
+    handleExternalName(data, 'networks');
+    handleExternalName(data, 'volumes');
+
     return (
         logs.map((m) => `# ${m.replace(/\n/g, '\n#')}`).join('\n') +
         (logs.length > 0 ? '\n' : '') +
@@ -273,7 +281,6 @@ export const migrateToCommonSpec = (content: string, configuration?: Configurati
     const data = yamlParse(result);
     if (!data) return content;
     if (typeof data === 'string') return content;
-    if (!data.version) return result;
 
     const logs = result.match(/^\s*#[^\r\n]*/gm) || [];
     // const log = message => logs.push(message);
@@ -296,6 +303,9 @@ export const migrateToCommonSpec = (content: string, configuration?: Configurati
     const output = { name: '<your project name>', ...data };
 
     delete output.version;
+
+    handleExternalName(output, 'networks');
+    handleExternalName(output, 'volumes');
 
     return (
         logs.map((m) => `# ${m.replace(/^\s*#\s+/g, '')}`).join('\n') +
