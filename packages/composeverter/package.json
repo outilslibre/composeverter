@@ -1,6 +1,6 @@
 {
   "name": "composeverter",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "description": "Docker Compose file utilities (converters and other utilities)",
   "main": "dist/composeverter.js",
   "license": "MIT",

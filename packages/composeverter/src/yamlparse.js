@@ -35,5 +35,5 @@ export const yamlCheck = (content: string) => {
 
 export const yamlParse = (content: string) => {
     yamlCheck(content);
-    return yaml.parse(content);
+    return yaml.parse(content, { intAsBigInt: true });
 };
