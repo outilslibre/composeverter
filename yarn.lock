@@ -4433,14 +4433,14 @@ compare-func@^2.0.0:
     dot-prop "^5.1.0"
 
 composeverter@latest:
-  version "1.7.3"
-  resolved "https://registry.yarnpkg.com/composeverter/-/composeverter-1.7.3.tgz#30aad6acf43c335a2d81e8c535e8261cb27b5928"
-  integrity sha512-UzKsnZpy8u8gEEBbcG6as+IeZlOVM4G3wuDXTyt7QuMhrSNJ2H2B9j6LXHEbKOVPEpDLiterYhfZuL5y7GBgWA==
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/composeverter/-/composeverter-1.7.4.tgz#6addce3b420ae92aca4d1d45193cca6b2cdbe904"
+  integrity sha512-hcx+pdBTiqbL3CAQMYdwICBApQpzcLTHruYQCFVG3plR9YG1s7mNNvgi+tajygCK41B44EckTGDenwRxdKVkUQ==
   dependencies:
     ajv "^8.x"
     ajv-errors "^3.x"
     core-js "^2.5.5"
-    yaml "^1.10.2"
+    yaml "^2.x"
 
 compressible@~2.0.18:
   version "2.0.18"
@@ -13745,7 +13745,7 @@ yaml@^1.10.0, yaml@^1.10.2, yaml@^1.7.2:
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-1.10.2.tgz#2301c5ffbf12b467de8da2333a459e29e7920e4b"
   integrity sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==
 
-yaml@^2.3.4:
+yaml@^2.3.4, yaml@^2.x:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.7.0.tgz#aef9bb617a64c937a9a748803786ad8d3ffe1e98"
   integrity sha512-+hSoy/QHluxmC9kCIJyL/uyFmLmc+e5CFR5Wa+bpIhIj85LVb9ZH2nVnqrHoSvKogwODv0ClqZkmiSSaIH5LTA==

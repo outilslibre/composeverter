@@ -5,11 +5,9 @@ import { getPortLongSyntaxFromPortSpec } from './portutils';
 
 const yaml = require('yaml');
 
-yaml.scalarOptions.null.nullStr = '';
-
 export const yamlStringify = (data: any, configuration?: Configuration) => {
     applyExpansions(data, configuration);
-    return yaml.stringify(data, { indent: (configuration || {}).indent || 4, simpleKeys: true }).trim();
+    return yaml.stringify(data, { indent: (configuration || {}).indent || 4, simpleKeys: true, nullStr: '' }).trim();
 };
 
 interface Configuration {

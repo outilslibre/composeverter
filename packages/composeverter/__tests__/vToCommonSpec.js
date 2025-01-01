@@ -203,7 +203,7 @@ services:
     db:
         image: postgresql
 networks:
-    some_net: 
+    some_net:
 volumes:
     some_vol:"
 `);

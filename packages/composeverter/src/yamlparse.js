@@ -2,8 +2,6 @@
 
 const yaml = require('yaml');
 
-yaml.scalarOptions.null.nullStr = '';
-
 class YamlSyntaxError extends Error {
     constructor(message, lines, details) {
         super(message);
@@ -21,10 +19,10 @@ export const yamlCheck = (content: string) => {
 
     doc.errors.forEach((e, i) => {
         const errorMsg = e.message.split(':\n')[0];
-        messages.push({ line: e.linePos.start.line, message: errorMsg, pos: e.linePos });
+        messages.push({ line: e.linePos[0].line, message: errorMsg, pos: e.linePos });
         Array.from(
-            { length: e.linePos.end ? e.linePos.end.line - e.linePos.start.line : 1 },
-            (_, l) => e.linePos.start.line + l,
+            { length: e.linePos ? e.linePos[1].line - e.linePos[0].line : 1 },
+            (_, l) => e.linePos[0].line + l,
         ).forEach((line) => lines.push(line));
     });
 

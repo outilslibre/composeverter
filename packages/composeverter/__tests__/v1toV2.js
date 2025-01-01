@@ -63,7 +63,7 @@ someapp:
                     - 9.9.9.9
                 environment:
                     RACK_ENV: development
-                    SESSION_SECRET: 
+                    SESSION_SECRET:
                 extends:
                     file: common.yml
                     service: webapp

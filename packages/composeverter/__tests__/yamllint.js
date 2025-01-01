@@ -24,14 +24,11 @@ db:
             { expandVolumes: true, expandPorts: true },
         );
     }).toThrowErrorMatchingInlineSnapshot(`
-"All collection items must start at the same column at line 2, column 1
-A collection cannot be both a mapping and a sequence at line 3, column 3
-Failed to resolve SEQ_ITEM node here at line 6, column 3
+"A block sequence may not be used as an implicit map key at line 6, column 1
+Implicit keys need to be on a single line at line 6, column 3
 Implicit map keys need to be followed by map values at line 6, column 3
 Nested mappings are not allowed in compact mappings at line 7, column 6
-Implicit map keys need to be on a single line at line 7, column 6
-Failed to resolve SEQ_ITEM node here at line 9, column 5
-Implicit map keys need to be followed by map values at line 9, column 5"
+Implicit keys need to be on a single line at line 7, column 6"
 `);
 });
 
@@ -48,11 +45,7 @@ db:
   image: postgresql`,
             { expandVolumes: true, expandPorts: true },
         );
-    }).toThrowErrorMatchingInlineSnapshot(`
-"Missing closing 'quote at line 6, column 7
-Multi-line single-quoted string needs to be sufficiently indented at line 6, column 7
-Multi-line single-quoted string needs to be sufficiently indented at line 6, column 7"
-`);
+    }).toThrowErrorMatchingInlineSnapshot(`"Missing closing 'quote at line 8, column 20"`);
 });
 
 test('v1 to CommonSpec, custom indent 2', () => {
@@ -164,7 +157,7 @@ volumes:
 `),
         ),
     ).toMatchInlineSnapshot(
-        `"[{\\"line\\":2,\\"message\\":\\"Line 2(/dontexists): 'dontexists' is unknown for '/dontexists'\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/\\"},{\\"line\\":33,\\"message\\":\\"Line 33(/networks/front-tier/truc): 'truc' is unknown for '/networks/front-tier/truc'\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/06-networks/#truc\\"},{\\"line\\":47,\\"message\\":\\"Line 47(/volumes/db_data/truc): 'truc' is unknown for '/volumes/db_data/truc'\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/07-volumes/#truc\\"},{\\"line\\":41,\\"message\\":\\"Line 41(/secrets/db_password/fiel): 'fiel' is unknown for '/secrets/db_password/fiel'\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/09-secrets/#fiel\\"},{\\"line\\":37,\\"message\\":\\"Line 37(/configs/http_config/fiel): 'fiel' is unknown for '/configs/http_config/fiel'\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/08-configs/#fiel\\"}]"`,
+        `"[{\\"line\\":30,\\"message\\":\\"Line 30(/dontexists): 'dontexists' is unknown for '/dontexists'\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/\\"},{\\"line\\":34,\\"message\\":\\"Line 34(/networks/front-tier/truc): 'truc' is unknown for '/networks/front-tier/truc'\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/06-networks/#truc\\"},{\\"line\\":48,\\"message\\":\\"Line 48(/volumes/db_data/truc): 'truc' is unknown for '/volumes/db_data/truc'\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/07-volumes/#truc\\"},{\\"line\\":41,\\"message\\":\\"Line 41(/secrets/db_password/fiel): 'fiel' is unknown for '/secrets/db_password/fiel'\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/09-secrets/#fiel\\"},{\\"line\\":37,\\"message\\":\\"Line 37(/configs/http_config/fiel): 'fiel' is unknown for '/configs/http_config/fiel'\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/08-configs/#fiel\\"}]"`,
     );
 });
 
