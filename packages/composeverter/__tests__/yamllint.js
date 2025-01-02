@@ -256,3 +256,26 @@ myapp:
           custom: 111111111111111111111111111111111111111111111111111"
   `);
 });
+
+test('validate invalid environment form in Docker Compose (https://github.com/composerize/decomposerize/issues/73#issuecomment-2469386987)', () => {
+    expect(
+        JSON.stringify(
+            validateDockerComposeToCommonSpec(`
+services:
+  paradedb:
+    image: oaklight/vectorsearch
+    container_name: vectorsearch
+    environment:
+      - POSTGRES USER: myuser
+      - POSTGRES_PASSHORD: mypassword
+      - POSTGRES_DB: nydatabase
+    ports:
+      - 5432:5432
+    volumes:
+      - $pwd/pgdata:/var/lib/postgresql/data/
+`),
+        ),
+    ).toMatchInlineSnapshot(
+        `"[{\\"line\\":7,\\"message\\":\\"Line 7(/services/paradedb/environment): must be object (type: {\\\\\\"type\\\\\\":\\\\\\"object\\\\\\"})\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/05-services/#environment\\"},{\\"line\\":7,\\"message\\":\\"Line 7(/services/paradedb/environment/0): must be string (type: {\\\\\\"type\\\\\\":\\\\\\"string\\\\\\"})\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/05-services/#environment\\"},{\\"line\\":8,\\"message\\":\\"Line 8(/services/paradedb/environment/1): must be string (type: {\\\\\\"type\\\\\\":\\\\\\"string\\\\\\"})\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/05-services/#environment\\"},{\\"line\\":9,\\"message\\":\\"Line 9(/services/paradedb/environment/2): must be string (type: {\\\\\\"type\\\\\\":\\\\\\"string\\\\\\"})\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/05-services/#environment\\"},{\\"line\\":7,\\"message\\":\\"Line 7(/services/paradedb/environment): must be either a Short Syntax (string(s)) or a Long Syntax (object(s))\\",\\"helpLink\\":\\"https://docs.docker.com/compose/compose-file/05-services/#environment\\"}]"`,
+    );
+});
