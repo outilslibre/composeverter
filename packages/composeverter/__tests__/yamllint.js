@@ -238,3 +238,21 @@ test('return empty when no services yaml 3x 2x', () => {
   "
 `);
 });
+
+test('v3 to CommonSpec', () => {
+    expect(
+        migrateToCommonSpec(`
+version: '3'
+services:
+myapp:
+  image: myapp-image
+  custom: 111111111111111111111111111111111111111111111111111
+`),
+    ).toMatchInlineSnapshot(`
+      "name: <your project name>
+      services:
+      myapp:
+          image: myapp-image
+          custom: 111111111111111111111111111111111111111111111111111"
+  `);
+});
