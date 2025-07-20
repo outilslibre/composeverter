@@ -9,7 +9,11 @@ http://composeverter.com - Convert Docker compose files from V1 to V2 (2.x, 3.x 
 Looking for turning `docker run` command(s) to Docker compose file: http://composerize.com / [Composerize](https://github.com/composerize/composerize)
 Looking for turning Docker compose file to `docker run` command(s): http://decomposerize.com / [Decomposerize](https://github.com/composerize/decomposerize)
 
-# API
+## Docker image
+
+A dockker image of composerize, decomposerize and composeverter websites is available here: https://github.com/Oaklight/composerize-minimal/blob/master/README_en.md (thanks to @Oaklight)
+
+## API
 
 See [NPM package](https://www.npmjs.com/package/composeverter)
 
